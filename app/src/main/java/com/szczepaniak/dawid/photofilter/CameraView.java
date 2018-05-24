@@ -5,6 +5,9 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.graphics.Rect;
+import android.graphics.YuvImage;
 import android.hardware.Camera;
 import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
@@ -14,8 +17,12 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
+import android.widget.ImageView;
 
 
+import java.io.ByteArrayOutputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -33,6 +40,9 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private boolean preview = true;
     Singleton singleton;
     private GestureDetector gestureDetector;
+
+    ImageView photo;
+
     public CameraView(Context context) {
         this(context, null);
     }
@@ -48,15 +58,11 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
         singleton =  Singleton.getInstance();
         cameraID = singleton.cameraID;
-        gestureDetector = new GestureDetector(singleton.getActivity(), new GestureDetector.SimpleOnGestureListener() {
-            @Override
-            public boolean onDoubleTap(MotionEvent e) {
-                changeCameraID();
-                return super.onDoubleTap(e);
-            }
-        });
+
+
 
     }
+
 
     @Override
     public void surfaceChanged(SurfaceHolder holder, int format, int w, int h) {
@@ -105,7 +111,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     public boolean onTouchEvent(MotionEvent event){
 
         int action = MotionEventCompat.getActionMasked(event);
-        gestureDetector.onTouchEvent(event);
 
         float x = event.getX();
         double delta = 0;
@@ -128,7 +133,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
 
         if(delta >= 1){
-            changeCameraID();
+          //  changeCameraID();
         }
         return true;
     }
@@ -174,50 +179,52 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
    public void takePhoto(){
 
-        if(preview == true) {
-            camera.stopPreview();
-            preview = false;
-        }else {
-            camera.startPreview();
-            preview = true;
-        }
+
+        camera.takePicture(null, null, null, new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] bytes, Camera camera) {
+
+                BitmapFactory.Options options = new BitmapFactory.Options();
+                options.inDither = false;
+                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                Bitmap btm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
+                Bitmap scaledBitmap;
+                scaledBitmap = Bitmap.createScaledBitmap(btm,photo.getHeight(),photo.getWidth(),true);
+                Matrix matrix = new Matrix();
+                photo.setImageBitmap(scaledBitmap);
+                photo.setVisibility(VISIBLE);
+            }
+        });
+
+       if(preview == true) {
+           camera.stopPreview();
+           preview = false;
+       }else {
+           camera.startPreview();
+           preview = true;
+       }
+      // this.setVisibility(INVISIBLE);
    }
 
-   public void changeCameraID(){
+   public void changeCameraID(MainActivity activity){
 
-       camera.release();
+       if(preview) {
+           camera.release();
 
-       if(cameraID == Camera.CameraInfo.CAMERA_FACING_BACK){
-           cameraID = Camera.CameraInfo.CAMERA_FACING_FRONT;
-       }
-       else {
-           cameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
-       }
-       try {
-           camera = android.hardware.Camera.open(cameraID);
-           android.hardware.Camera.Parameters parameters = camera.getParameters();
-
-           if (Integer.parseInt(Build.VERSION.SDK) >= 8)
-               camera.setDisplayOrientation(90);
-           else {
-               if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_PORTRAIT) {
-                   parameters.set("orientation", "portrait");
-                   parameters.set("rotation", 90);
-               }
-               if (getResources().getConfiguration().orientation == Configuration.ORIENTATION_LANDSCAPE) {
-                   parameters.set("orientation", "landscape");
-                   parameters.set("rotation", 90);
-               }
+           if (cameraID == Camera.CameraInfo.CAMERA_FACING_BACK) {
+               cameraID = Camera.CameraInfo.CAMERA_FACING_FRONT;
+           } else {
+               cameraID = Camera.CameraInfo.CAMERA_FACING_BACK;
            }
-           camera.setParameters(parameters);
-       } catch (Exception e) {
-           e.printStackTrace();
+
+           singleton.setCameraID(cameraID);
+           Intent intent = new Intent();
+           intent.setClass(activity, activity.getClass());
+           activity.startActivity(intent);
+           activity.finish();
        }
-//       try {
-//          // camera.setPreviewDisplay(surfaceHolder);
-//       } catch (IOException e) {
-//           e.printStackTrace();
-//       }
-       camera.startPreview();
+
    }
+
+
 }
