@@ -25,6 +25,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * Created by dawid on 15.05.2018.
@@ -32,16 +34,18 @@ import java.util.List;
 
 public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
 
-    private Camera camera;
-    private int cameraID = 1;
+    public Camera camera;
+    public  int cameraID = 1;
     private SurfaceHolder surfaceHolder;
     private Bitmap mBitmap;
-    Camera.PictureCallback mPicture;
     private boolean preview = true;
     Singleton singleton;
     private GestureDetector gestureDetector;
-
+    private byte[] mPreviewFrameBuffer;
     ImageView photo;
+    private final Lock lock = new ReentrantLock();
+    Camera.PictureCallback mPicture;
+    boolean isTakePhoto = false;
 
     public CameraView(Context context) {
         this(context, null);
@@ -59,7 +63,17 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         singleton =  Singleton.getInstance();
         cameraID = singleton.cameraID;
 
+        mPicture = new Camera.PictureCallback() {
+            @Override
+            public void onPictureTaken(byte[] data, Camera camera) {
 
+                Bitmap bitmap = YuvByteArrayToBitmap(data, camera);
+                photo.setVisibility(View.VISIBLE);
+                photo.setImageBitmap(bitmap);
+                isTakePhoto = false;
+
+            }
+        };
 
     }
 
@@ -97,14 +111,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
             }
         }
 
-//       mPicture = new () {
-//            @Override
-//            public void onPictureTaken(byte[] bytes) {
-//
-//                Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
-//                mBitmap = bitmap;
-//            }
-//        };
 
     }
 
@@ -145,7 +151,6 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         try {
             camera = android.hardware.Camera.open(cameraID);
             android.hardware.Camera.Parameters parameters = camera.getParameters();
-
             if (Integer.parseInt(Build.VERSION.SDK) >= 8)
                 camera.setDisplayOrientation(90);
             else {
@@ -177,33 +182,61 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         }
     }
 
+
+   Camera.PictureCallback mPictureCallback = (new Camera.PictureCallback() {
+        @Override
+        public void onPictureTaken(byte[] data, android.hardware.Camera camera) {
+
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            options.inDither = false;
+            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+            Bitmap scaledBitmap;
+            scaledBitmap = Bitmap.createScaledBitmap(btm,photo.getHeight(),photo.getWidth()+10,true);
+            Matrix matrix = new Matrix();
+
+            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+                //matrix.preScale(1.0f, -1.0f);
+                matrix.setScale(1,-1);
+                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, false);
+                matrix.postRotate(-90);
+                //image.setScaleX(-1);
+//                camView.setVisibility(View.GONE);
+                photo.setImageBitmap(scaledBitmap);
+//                image.setVisibility(View.VISIBLE);
+
+
+            }else {
+                matrix.postRotate(90);
+            }
+
+
+            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+            photo.setImageBitmap(rotatedBitmap);
+
+
+            FileOutputStream outStream = null;
+
+        }
+
+
+    });
+
+
+//    @Override
+//    public void onPreviewFrame(byte[] bytes, Camera camera) {
+//
+//
+//         }
+
    public void takePhoto(){
 
 
-        camera.takePicture(null, null, null, new Camera.PictureCallback() {
-            @Override
-            public void onPictureTaken(byte[] bytes, Camera camera) {
+       photo.setVisibility(VISIBLE);
+       camera.takePicture(null, null,null, mPictureCallback);
+       //this.setVisibility(View.GONE);
 
-                BitmapFactory.Options options = new BitmapFactory.Options();
-                options.inDither = false;
-                options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-                Bitmap btm = BitmapFactory.decodeByteArray(bytes, 0, bytes.length, options);
-                Bitmap scaledBitmap;
-                scaledBitmap = Bitmap.createScaledBitmap(btm,photo.getHeight(),photo.getWidth(),true);
-                Matrix matrix = new Matrix();
-                photo.setImageBitmap(scaledBitmap);
-                photo.setVisibility(VISIBLE);
-            }
-        });
 
-       if(preview == true) {
-           camera.stopPreview();
-           preview = false;
-       }else {
-           camera.startPreview();
-           preview = true;
-       }
-      // this.setVisibility(INVISIBLE);
    }
 
    public void changeCameraID(MainActivity activity){
@@ -225,6 +258,18 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
        }
 
    }
+
+
+    public static Bitmap YuvByteArrayToBitmap(byte[] data, Camera camera) {
+        Camera.Parameters parameters = camera.getParameters();
+        Camera.Size size = parameters.getPreviewSize();
+        YuvImage image = new YuvImage(data, parameters.getPreviewFormat(), size.width, size.height, null);
+        ByteArrayOutputStream out = new ByteArrayOutputStream();
+        image.compressToJpeg(new Rect(0, 0, size.width, size.height), 100, out);
+        byte[] imageBytes = out.toByteArray();
+        return BitmapFactory.decodeByteArray(imageBytes, 0, imageBytes.length);
+    }
+
 
 
 }

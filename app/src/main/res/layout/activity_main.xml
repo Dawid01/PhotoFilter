@@ -22,13 +22,7 @@
             android:visibility="gone"
             app:srcCompat="@android:color/darker_gray" />
 
-        <ImageView
-            android:id="@+id/Photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/PhotoView"
-            android:layout_toEndOf="@+id/PhotoView"
-            android:visibility="gone" />
+
 
         <com.szczepaniak.dawid.photofilter.CameraView
             android:id="@+id/CameraView"
@@ -36,6 +30,14 @@
             android:layout_height="match_parent"
             android:layout_alignParentTop="true"
             android:layout_toEndOf="@+id/PhotoView" />
+
+        <ImageView
+            android:id="@+id/Photo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@+id/PhotoView"
+            android:layout_toEndOf="@+id/PhotoView"
+            android:visibility="gone" />
 
         <GridLayout
             android:id="@+id/FiltrsGrid"

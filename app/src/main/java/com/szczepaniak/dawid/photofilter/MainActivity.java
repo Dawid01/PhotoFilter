@@ -2,6 +2,10 @@ package com.szczepaniak.dawid.photofilter;
 
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Matrix;
+import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -16,6 +20,8 @@ import android.widget.ImageView;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.view.GestureDetector;
+
+import java.io.FileOutputStream;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -90,6 +96,7 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
 
                 cameraView.takePhoto();
+                photo.setVisibility(View.VISIBLE);
                 options.setVisibility(View.VISIBLE);
                 back.setVisibility(View.VISIBLE);
                 gallery.setVisibility(View.GONE);
@@ -143,5 +150,6 @@ public class MainActivity extends AppCompatActivity {
             //Toast.makeText(this,"Permission is Granted", Toast.LENGTH_SHORT).show();
         }
     }
+
 
 }
