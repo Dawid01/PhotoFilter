@@ -4,24 +4,15 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@android:color/darker_gray"
+    android:background="@color/colorPrimary"
     tools:context="com.szczepaniak.dawid.photofilter.MainActivity">
 
     <RelativeLayout
         android:id="@+id/layout"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:background="@color/colorAccent"
         tools:layout_editor_absoluteX="0dp"
         tools:layout_editor_absoluteY="0dp">
-
-        <ImageView
-            android:id="@+id/PhotoView"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:visibility="gone"
-            app:srcCompat="@android:color/darker_gray" />
-
 
 
         <com.szczepaniak.dawid.photofilter.CameraView
@@ -33,11 +24,13 @@
 
         <ImageView
             android:id="@+id/Photo"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_below="@+id/PhotoView"
-            android:layout_toEndOf="@+id/PhotoView"
-            android:visibility="gone" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/linearLayout"
+            android:layout_centerHorizontal="true"
+            android:layout_marginTop="22dp"
+            android:paddingBottom="120dp"
+            android:visibility="visible" />
 
         <GridLayout
             android:id="@+id/FiltrsGrid"
@@ -73,13 +66,65 @@
             android:paddingTop="5dp"
             app:srcCompat="@drawable/gallery" />
 
+        <HorizontalScrollView
+            android:id="@+id/Filters"
+            android:layout_width="match_parent"
+            android:layout_height="100dp"
+            android:layout_alignParentBottom="true"
+            android:layout_toEndOf="@+id/PhotoView"
+            android:layout_weight="1"
+            android:alpha="50"
+            android:background="@color/colorPrimaryDarkAlpha">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/Filtr0"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:id="@+id/Filtr1"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:id="@+id/Filtr2"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:id="@+id/Filtr3"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+                <ImageView
+                    android:id="@+id/Filtr4"
+                    android:layout_width="100dp"
+                    android:layout_height="100dp"
+                    android:layout_weight="1"
+                    app:srcCompat="@mipmap/ic_launcher" />
+
+            </LinearLayout>
+
+        </HorizontalScrollView>
+
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignTop="@+id/Back"
             android:layout_toEndOf="@+id/PhotoView"
             android:orientation="horizontal"
-            android:paddingTop="5dp">
+            android:paddingTop="5dp"
+            android:id="@+id/linearLayout">
 
             <ImageView
                 android:id="@+id/Back"
@@ -102,6 +147,7 @@
                 android:layout_weight="1"
                 android:visibility="visible"
                 app:srcCompat="@drawable/menu" />
+
         </LinearLayout>
 
     </RelativeLayout>

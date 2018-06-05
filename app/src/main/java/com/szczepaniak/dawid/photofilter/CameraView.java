@@ -6,6 +6,7 @@ import android.content.res.Configuration;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.graphics.Rect;
 import android.graphics.YuvImage;
 import android.hardware.Camera;
@@ -13,6 +14,7 @@ import android.os.Build;
 import android.support.v4.view.MotionEventCompat;
 import android.util.AttributeSet;
 import android.util.SparseArray;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
@@ -46,6 +48,10 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     private final Lock lock = new ReentrantLock();
     Camera.PictureCallback mPicture;
     boolean isTakePhoto = false;
+    int width;
+    int height;
+    View cameraView;
+    MainActivity mainActivity;
 
     public CameraView(Context context) {
         this(context, null);
@@ -62,7 +68,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         surfaceHolder.setType(SurfaceHolder.SURFACE_TYPE_NORMAL);
         singleton =  Singleton.getInstance();
         cameraID = singleton.cameraID;
-
+        cameraView = this;
         mPicture = new Camera.PictureCallback() {
             @Override
             public void onPictureTaken(byte[] data, Camera camera) {
@@ -187,35 +193,65 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         @Override
         public void onPictureTaken(byte[] data, android.hardware.Camera camera) {
 
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            options.inDither = false;
-            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
-            Bitmap scaledBitmap;
-            scaledBitmap = Bitmap.createScaledBitmap(btm,photo.getHeight(),photo.getWidth()+10,true);
-            Matrix matrix = new Matrix();
+            singleton.setPhotoData(data);
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inDither = false;
+//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+//            Matrix matrix = new Matrix();
+//            Bitmap RotateBitmap;
+//            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+//
+//                matrix.postRotate(-90);
+//                matrix.preScale(1,-1);
+//
+//            }else {
+//                matrix.postRotate(90);
+//
+//            }
+//            RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
+//            float w = RotateBitmap.getWidth();
+//            float h = RotateBitmap.getHeight();
+//            float scale = w/photo.getHeight();
+//            //RotateBitmap = Bitmap.createBitmap(btm,0,0,photo.getHeight(),(int) (h * scale));
+//
+//            photo.setImageBitmap(RotateBitmap);
+//            mainActivity.normalBitmap = singleton.StringToBitmap(singleton.getPhotoBitmap());
+//            mainActivity.createFiltrs();
+            cameraView.setVisibility(View.INVISIBLE);
+//            singleton.setPhotoBitmap(singleton.BitmapToString(RotateBitmap));
 
-            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
-                //matrix.preScale(1.0f, -1.0f);
-                matrix.setScale(1,-1);
-                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, false);
-                matrix.postRotate(-90);
-                //image.setScaleX(-1);
-//                camView.setVisibility(View.GONE);
-                photo.setImageBitmap(scaledBitmap);
-//                image.setVisibility(View.VISIBLE);
-
-
-            }else {
-                matrix.postRotate(90);
-            }
-
-
-            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-            photo.setImageBitmap(rotatedBitmap);
-
-
-            FileOutputStream outStream = null;
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            options.inDither = false;
+//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+//            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
+//            Bitmap scaledBitmap;
+//            scaledBitmap = Bitmap.createScaledBitmap(btm,btm.getHeight(),photo.getWidth(),true);
+//            Matrix matrix = new Matrix();
+//
+//            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+//                //matrix.preScale(1.0f, -1.0f);
+//                matrix.setScale(1,-1);
+//                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, false);
+//                matrix.postRotate(-90);
+//                //image.setScaleX(-1);
+////                camView.setVisibility(View.GONE);
+//                photo.setImageBitmap(scaledBitmap);
+////                image.setVisibility(View.VISIBLE);
+//
+//
+//            }else {
+//                matrix.postRotate(90);
+//            }
+//
+//
+//            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
+//            photo.setImageBitmap(rotatedBitmap);
+//            singleton.setPhotoBitmap(rotatedBitmap);
+//
+//
+//            FileOutputStream outStream = null;
+            mainActivity.createFiltrs();
 
         }
 
@@ -271,5 +307,7 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
     }
 
 
-
+    public void setMainActivity(MainActivity mainActivity) {
+        this.mainActivity = mainActivity;
+    }
 }

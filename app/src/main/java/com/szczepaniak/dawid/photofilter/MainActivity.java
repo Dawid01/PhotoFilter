@@ -5,25 +5,29 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
+import android.graphics.Point;
 import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.view.Display;
 import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
+import android.widget.HorizontalScrollView;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
 import android.view.GestureDetector;
 
 import java.io.FileOutputStream;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity  {
 
     RelativeLayout layout;
     private final int CAMERA_REQUEST_CODE= 2;
@@ -35,6 +39,16 @@ public class MainActivity extends AppCompatActivity {
     ImageView download;
     ImageView options;
     ImageView gallery;
+    int width;
+    int height;
+    ProgressBar loader;
+
+    Bitmap normalBitmap;
+    Bitmap iconBitmap;
+
+    NormalFiltr normalFiltr;
+
+    HorizontalScrollView filters;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,13 +59,15 @@ public class MainActivity extends AppCompatActivity {
 
         layout = findViewById(R.id.layout);
         cameraView = findViewById(R.id.CameraView);
-       fullScreenOptions();
+        cameraView.setMainActivity(this);
+        fullScreenOptions();
         photo = findViewById(R.id.Photo);
         back = findViewById(R.id.Back);
         gallery = findViewById(R.id.Gallery);
         options = findViewById(R.id.Menu);
 
-
+        filters = findViewById(R.id.Filters);
+        filters.setVisibility(View.GONE);
         options.setVisibility(View.INVISIBLE);
         back.setVisibility(View.INVISIBLE);
 
@@ -59,9 +75,18 @@ public class MainActivity extends AppCompatActivity {
         singleton = Singleton.getInstance();
         singleton.setActivity(this);
         inputsSystem();
-
         askPermission(android.Manifest.permission.CAMERA, CAMERA_REQUEST_CODE);
         cameraView.photo = photo;
+
+        Display display = getWindowManager().getDefaultDisplay();
+        Point size = new Point();
+        display.getSize(size);
+        width = size.x;
+        height = size.y;
+        cameraView.height = height;
+        cameraView.width = width;
+
+        //normalFiltr = findViewById(R.id.NormalFiltr);
 
     }
 
@@ -88,6 +113,17 @@ public class MainActivity extends AppCompatActivity {
 
                 gestureDetector.onTouchEvent(motionEvent);
                 return false;
+            }
+        });
+
+        back.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                Intent myIntent = getIntent();
+                myIntent.setFlags(Intent.FLAG_ACTIVITY_NO_ANIMATION);
+                finish();
+                startActivity(myIntent);
             }
         });
 
@@ -151,5 +187,43 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+
+    void createFiltrs(){
+        BitmapFactory.Options options = new BitmapFactory.Options();
+        options.inDither = false;
+        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+        Bitmap btm = BitmapFactory.decodeByteArray(singleton.getPhotoData(), 0, singleton.getPhotoData().length, options);
+        Matrix matrix = new Matrix();
+        Bitmap RotateBitmap;
+        if(cameraView.cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+
+            matrix.postRotate(-90);
+            matrix.preScale(1,-1);
+
+        }else {
+            matrix.postRotate(90);
+
+        }
+        RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
+        float w = RotateBitmap.getWidth();
+        float h = RotateBitmap.getHeight();
+        float scale = w/photo.getHeight();
+        //RotateBitmap = Bitmap.createBitmap(btm,0,0,photo.getHeight(),(int) (h * scale));
+
+        photo.setImageBitmap(RotateBitmap);
+        normalBitmap = RotateBitmap;
+        cameraView.setVisibility(View.INVISIBLE);
+        //photo.setDrawingCacheEnabled(true);
+        //photo.buildDrawingCache(true);
+        //Bitmap bitmap = photo.getDrawingCache();
+        if(normalBitmap != null) {
+            filters.setVisibility(View.VISIBLE);
+            //normalFiltr.setNormalBitmap();
+            iconBitmap = Bitmap.createBitmap(normalBitmap, 200, 200, 400, 400, null, true);
+            ImageView filtr1 = findViewById(R.id.Filtr0);
+            filtr1.setImageBitmap(iconBitmap);
+        }
+
+    }
 
 }
