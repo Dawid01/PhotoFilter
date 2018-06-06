@@ -7,6 +7,7 @@ import android.graphics.Color;
 import android.graphics.ColorMatrix;
 import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
+import android.graphics.drawable.GradientDrawable;
 import android.renderscript.Allocation;
 import android.renderscript.Element;
 import android.renderscript.RenderScript;
@@ -52,6 +53,11 @@ public class FilterView extends AppCompatImageView{
                 }
             }
         });
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setStroke(5, Color.rgb(239, 235, 233));
+        gd.setCornerRadius(15);
+        this.setBackground(gd);
     }
 
     public FilterView(Context context, @Nullable AttributeSet attrs, int defStyleAttr) {
@@ -66,12 +72,18 @@ public class FilterView extends AppCompatImageView{
         this.type = type;
     }
 
-    public void setBitmaps(Bitmap normalBitmap, Bitmap iconBitmap){
+    public void setBitmaps(Bitmap normalBitmap){
         this.normalBitmap = normalBitmap;
-        this.iconBitmap = iconBitmap;
-        this.setImageBitmap(createIconFiltr(iconBitmap));
+        //this.iconBitmap = iconBitmap;
         filterBitmap = createFiltr(normalBitmap);
-        invalidate();
+        copreBitmap();
+        GradientDrawable gd = new GradientDrawable();
+        gd.setStroke(3, Color.rgb(239, 235, 233));
+        gd.setCornerRadius(20);
+        this.setBackground(gd);
+        this.setImageBitmap(iconBitmap);
+
+        //invalidate();
     }
 
 
@@ -81,7 +93,6 @@ public class FilterView extends AppCompatImageView{
         switch (type){
 
             case "Normal":
-
                 bitmap = normalBitmap;
                 break;
             case "Negativ":
@@ -91,7 +102,22 @@ public class FilterView extends AppCompatImageView{
                 bitmap = setMonochrome(normalBitmap);
                 break;
             case "Sepia":
-                bitmap = setSepia(normalBitmap);
+               bitmap = setBinary(normalBitmap);
+//                bitmap = setFuzzyGlass(normalBitmap,new float[]{
+//                        0,  20,  0,
+//                        20, -59, 20,
+//                        1,  13,  0 });
+
+//                bitmap = setEdgeDetection(normalBitmap,new float[]{
+//                        -1, -1, -1,
+//                        -1 , 8, -1,
+//                        -1, -1, -1 } );
+
+//                   bitmap = setSharpen(normalBitmap,new float[]{
+//                           0, -1, 0,
+//                           -1 , 5, -1,
+//                           0, -1, 0  } );
+
                 break;
             case "Binary":
                // bitmap = setBinary(normalBitmap);
@@ -101,29 +127,19 @@ public class FilterView extends AppCompatImageView{
         return bitmap;
     }
 
-    Bitmap createIconFiltr(Bitmap bitmap){
 
-        switch (type){
+    public void copreBitmap(){
 
-            case "Normal":
+        if (filterBitmap.getWidth() >= filterBitmap.getHeight()){
 
-                bitmap = iconBitmap;
-                break;
-            case "Negativ":
-                bitmap = setNegativ(iconBitmap);
-                break;
-            case "Monochrome":
-                bitmap = setMonochrome(iconBitmap);
-                break;
-            case "Sepia":
-                bitmap = setSepia(iconBitmap);
-                break;
-            case "Binary":
-               // bitmap = setBinary(iconBitmap);
-                break;
+            iconBitmap = Bitmap.createBitmap(filterBitmap,filterBitmap.getWidth()/2 - filterBitmap.getHeight()/2, 0, filterBitmap.getHeight(), filterBitmap.getHeight()
+            );
+
+        }else{
+
+            iconBitmap = Bitmap.createBitmap(filterBitmap, 0, filterBitmap.getHeight()/2 - filterBitmap.getWidth()/2, filterBitmap.getWidth(), filterBitmap.getWidth()
+            );
         }
-
-        return bitmap;
     }
 
     public Bitmap setNegativ(Bitmap bitmap) {

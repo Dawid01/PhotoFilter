@@ -19,8 +19,17 @@
             android:id="@+id/CameraView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:layout_alignParentTop="true"
-            android:layout_toEndOf="@+id/PhotoView" />
+            android:layout_alignBottom="@+id/Filters"
+            android:layout_alignParentStart="true" />
+
+        <ProgressBar
+            android:id="@+id/progressBar2"
+            style="?android:attr/progressBarStyle"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignEnd="@+id/Camera"
+            android:layout_below="@+id/Photo"
+            android:layout_marginTop="66dp" />
 
         <ImageView
             android:id="@+id/Photo"
@@ -69,8 +78,9 @@
         <HorizontalScrollView
             android:id="@+id/Filters"
             android:layout_width="match_parent"
-            android:layout_height="100dp"
+            android:layout_height="115dp"
             android:layout_alignParentBottom="true"
+            android:layout_margin="3dp"
             android:layout_toEndOf="@+id/PhotoView"
             android:layout_weight="1"
             android:alpha="50"
@@ -79,56 +89,65 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:orientation="horizontal">
+                android:orientation="horizontal"
+                android:paddingLeft="5dp"
+                android:paddingTop="5dp">
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/normalFiltr"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/negativFiltr"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/monochromeFiltr"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/sepiaFiltr"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/binaryFiltr"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/f7"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
 
                 <com.szczepaniak.dawid.photofilter.FilterView
                     android:id="@+id/f8"
                     android:layout_width="100dp"
                     android:layout_height="100dp"
+                    android:layout_margin="5dp"
                     android:layout_weight="1"
-                    android:background="@mipmap/ic_launcher_round" />
+                    android:background="@android:drawable/ic_menu_gallery" />
             </LinearLayout>
 
         </HorizontalScrollView>
@@ -164,6 +183,43 @@
                 android:visibility="visible"
                 app:srcCompat="@drawable/menu" />
 
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/FiltersOptions"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_above="@+id/Filters"
+            android:layout_centerHorizontal="true"
+            android:orientation="horizontal"
+            android:visibility="gone">
+
+            <ImageView
+                android:id="@+id/ShowClose"
+                android:layout_width="wrap_content"
+                android:layout_height="match_parent"
+                android:layout_above="@+id/Filters"
+                android:layout_alignStart="@+id/Filters"
+                android:layout_weight="1"
+                android:paddingLeft="10dp"
+                app:srcCompat="@drawable/arrowdown" />
+
+            <Space
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1" />
+
+            <ImageView
+                android:id="@+id/Download"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignBottom="@+id/ShowClose"
+                android:layout_alignEnd="@+id/Filters"
+                android:layout_marginLeft="100dp"
+                android:layout_weight="1"
+                android:paddingBottom="5dp"
+                android:paddingRight="10dp"
+                app:srcCompat="@drawable/download" />
         </LinearLayout>
 
     </RelativeLayout>

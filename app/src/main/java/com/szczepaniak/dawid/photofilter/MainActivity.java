@@ -4,8 +4,10 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.graphics.Matrix;
 import android.graphics.Point;
+import android.graphics.drawable.GradientDrawable;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -44,9 +46,9 @@ public class MainActivity extends AppCompatActivity  {
     Bitmap normalBitmap;
     Bitmap iconBitmap;
 
-    FilterView FilterView;
 
     HorizontalScrollView filters;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,11 +60,14 @@ public class MainActivity extends AppCompatActivity  {
         layout = findViewById(R.id.layout);
         cameraView = findViewById(R.id.CameraView);
         cameraView.setMainActivity(this);
+        loader = findViewById(R.id.progressBar2);
+        loader.setVisibility(View.GONE);
         fullScreenOptions();
         photo = findViewById(R.id.Photo);
         back = findViewById(R.id.Back);
         gallery = findViewById(R.id.Gallery);
         options = findViewById(R.id.Menu);
+
 
         filters = findViewById(R.id.Filters);
         filters.setVisibility(View.GONE);
@@ -83,6 +88,11 @@ public class MainActivity extends AppCompatActivity  {
         height = size.y;
         cameraView.height = height;
         cameraView.width = width;
+
+        GradientDrawable gd = new GradientDrawable();
+        gd.setCornerRadius(10);
+        gd.setColor(Color.argb(70,239, 235, 233));
+        filters.setBackground(gd);
 
         //normalFiltr = findViewById(R.id.NormalFiltr);
 
@@ -187,43 +197,54 @@ public class MainActivity extends AppCompatActivity  {
 
 
     void createFiltrs(){
-        BitmapFactory.Options options = new BitmapFactory.Options();
-        options.inDither = false;
-        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-        Bitmap btm = BitmapFactory.decodeByteArray(singleton.getPhotoData(), 0, singleton.getPhotoData().length, options);
-        Matrix matrix = new Matrix();
-        Bitmap RotateBitmap;
-        if(cameraView.cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+        loader.setVisibility(View.VISIBLE);
 
-            matrix.postRotate(-90);
-            matrix.preScale(1,-1);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(0);
+                } catch( InterruptedException e ) {
 
-        }else {
-            matrix.postRotate(90);
+                }
 
-        }
-        RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+
+                        BitmapFactory.Options options = new BitmapFactory.Options();
+                        options.inDither = false;
+                        options.inPreferredConfig = Bitmap.Config.ARGB_8888;
+                        Bitmap btm = BitmapFactory.decodeByteArray(singleton.getPhotoData(), 0, singleton.getPhotoData().length, options);
+                        Matrix matrix = new Matrix();
+                        Bitmap RotateBitmap;
+                        if(cameraView.cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
+
+                            matrix.postRotate(-90);
+                            matrix.preScale(1,-1);
+
+                        }else {
+                            matrix.postRotate(90);
+
+                        }
+                        RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
 
 
-        photo.setImageBitmap(RotateBitmap);
-        normalBitmap = RotateBitmap;
-        cameraView.setVisibility(View.INVISIBLE);
+                        photo.setImageBitmap(RotateBitmap);
+                        normalBitmap = RotateBitmap;
+                        cameraView.setVisibility(View.INVISIBLE);
 
-        if(normalBitmap != null) {
-            filters.setVisibility(View.VISIBLE);
-            if (normalBitmap.getWidth() >= normalBitmap.getHeight()){
-
-                iconBitmap = Bitmap.createBitmap(normalBitmap,normalBitmap.getWidth()/2 - normalBitmap.getHeight()/2, 0, normalBitmap.getHeight(), normalBitmap.getHeight()
-                );
-
-            }else{
-
-                iconBitmap = Bitmap.createBitmap(normalBitmap, 0, normalBitmap.getHeight()/2 - normalBitmap.getWidth()/2, normalBitmap.getWidth(), normalBitmap.getWidth()
-                );
+                        if(normalBitmap != null) {
+                            filters.setVisibility(View.VISIBLE);
+                            //iconBitmap = Bitmap.createBitmap(normalBitmap, 400, 400, normalBitmap.getWidth()/2 - 800, normalBitmap.getHeight()/2 - 800, null, true);
+                            findFilters();
+                        }
+                    }
+                });
             }
-            //iconBitmap = Bitmap.createBitmap(normalBitmap, 400, 400, normalBitmap.getWidth()/2 - 800, normalBitmap.getHeight()/2 - 800, null, true);
-            findFilters();
-        }
+        }).start();
+
+       // loader.setVisibility(View.GONE);
+
 
     }
 
@@ -274,7 +295,7 @@ public class MainActivity extends AppCompatActivity  {
         new Thread(new Runnable() {
             public void run() {
                 try {
-                    Thread.sleep(6000);
+                    Thread.sleep(0);
                 } catch( InterruptedException e ) {
 
                 }
@@ -285,8 +306,9 @@ public class MainActivity extends AppCompatActivity  {
                         for(int i = 0; i < filters.size(); i++){
 
                             FilterView filterView = filters.get(i);
-                            filterView.setBitmaps(normalBitmap,iconBitmap);
-                        }                    }
+                            filterView.setBitmaps(normalBitmap);
+                        }
+                    }
                 });
             }
         }).start();
