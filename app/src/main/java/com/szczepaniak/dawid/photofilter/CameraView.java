@@ -194,76 +194,32 @@ public class CameraView extends SurfaceView implements SurfaceHolder.Callback {
         public void onPictureTaken(byte[] data, android.hardware.Camera camera) {
 
             singleton.setPhotoData(data);
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inDither = false;
-//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
-//            Matrix matrix = new Matrix();
-//            Bitmap RotateBitmap;
-//            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
-//
-//                matrix.postRotate(-90);
-//                matrix.preScale(1,-1);
-//
-//            }else {
-//                matrix.postRotate(90);
-//
-//            }
-//            RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
-//            float w = RotateBitmap.getWidth();
-//            float h = RotateBitmap.getHeight();
-//            float scale = w/photo.getHeight();
-//            //RotateBitmap = Bitmap.createBitmap(btm,0,0,photo.getHeight(),(int) (h * scale));
-//
-//            photo.setImageBitmap(RotateBitmap);
-//            mainActivity.normalBitmap = singleton.StringToBitmap(singleton.getPhotoBitmap());
-//            mainActivity.createFiltrs();
             cameraView.setVisibility(View.INVISIBLE);
-//            singleton.setPhotoBitmap(singleton.BitmapToString(RotateBitmap));
+//            new Thread(new Runnable() {
+//                public void run() {
+//                    try {
+//                        Thread.sleep(6000);
+//                    } catch( InterruptedException e ) {
+//
+//                    }
+//
+//                    Runnable runOnUiThread = (new Runnable() {
+//                        @Override
+//                        public void run() {
+//                            mainActivity.createFiltrs();
+//                        }
+//                    });
+//                }
+//            }).start();
 
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            options.inDither = false;
-//            options.inPreferredConfig = Bitmap.Config.ARGB_8888;
-//            Bitmap btm = BitmapFactory.decodeByteArray(data, 0, data.length, options);
-//            Bitmap scaledBitmap;
-//            scaledBitmap = Bitmap.createScaledBitmap(btm,btm.getHeight(),photo.getWidth(),true);
-//            Matrix matrix = new Matrix();
-//
-//            if(cameraID == android.hardware.Camera.CameraInfo.CAMERA_FACING_FRONT){
-//                //matrix.preScale(1.0f, -1.0f);
-//                matrix.setScale(1,-1);
-//                scaledBitmap = Bitmap.createBitmap(scaledBitmap, 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, false);
-//                matrix.postRotate(-90);
-//                //image.setScaleX(-1);
-////                camView.setVisibility(View.GONE);
-//                photo.setImageBitmap(scaledBitmap);
-////                image.setVisibility(View.VISIBLE);
-//
-//
-//            }else {
-//                matrix.postRotate(90);
-//            }
-//
-//
-//            Bitmap rotatedBitmap = Bitmap.createBitmap(scaledBitmap , 0, 0, scaledBitmap.getWidth(), scaledBitmap.getHeight(), matrix, true);
-//            photo.setImageBitmap(rotatedBitmap);
-//            singleton.setPhotoBitmap(rotatedBitmap);
-//
-//
-//            FileOutputStream outStream = null;
-            mainActivity.createFiltrs();
+             mainActivity.createFiltrs();
+
 
         }
 
 
     });
 
-
-//    @Override
-//    public void onPreviewFrame(byte[] bytes, Camera camera) {
-//
-//
-//         }
 
    public void takePhoto(){
 

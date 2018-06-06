@@ -6,7 +6,6 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Matrix;
 import android.graphics.Point;
-import android.hardware.Camera;
 import android.support.annotation.NonNull;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -23,9 +22,8 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.Toast;
-import android.view.GestureDetector;
 
-import java.io.FileOutputStream;
+import java.util.ArrayList;
 
 public class MainActivity extends AppCompatActivity  {
 
@@ -46,7 +44,7 @@ public class MainActivity extends AppCompatActivity  {
     Bitmap normalBitmap;
     Bitmap iconBitmap;
 
-    NormalFiltr normalFiltr;
+    FilterView FilterView;
 
     HorizontalScrollView filters;
 
@@ -205,25 +203,98 @@ public class MainActivity extends AppCompatActivity  {
 
         }
         RotateBitmap = Bitmap.createBitmap(btm,0,0,btm.getWidth(),btm.getHeight(),matrix,false);
-        float w = RotateBitmap.getWidth();
-        float h = RotateBitmap.getHeight();
-        float scale = w/photo.getHeight();
-        //RotateBitmap = Bitmap.createBitmap(btm,0,0,photo.getHeight(),(int) (h * scale));
+
 
         photo.setImageBitmap(RotateBitmap);
         normalBitmap = RotateBitmap;
         cameraView.setVisibility(View.INVISIBLE);
-        //photo.setDrawingCacheEnabled(true);
-        //photo.buildDrawingCache(true);
-        //Bitmap bitmap = photo.getDrawingCache();
+
         if(normalBitmap != null) {
             filters.setVisibility(View.VISIBLE);
-            //normalFiltr.setNormalBitmap();
-            iconBitmap = Bitmap.createBitmap(normalBitmap, 200, 200, 400, 400, null, true);
-            ImageView filtr1 = findViewById(R.id.Filtr0);
-            filtr1.setImageBitmap(iconBitmap);
+            if (normalBitmap.getWidth() >= normalBitmap.getHeight()){
+
+                iconBitmap = Bitmap.createBitmap(normalBitmap,normalBitmap.getWidth()/2 - normalBitmap.getHeight()/2, 0, normalBitmap.getHeight(), normalBitmap.getHeight()
+                );
+
+            }else{
+
+                iconBitmap = Bitmap.createBitmap(normalBitmap, 0, normalBitmap.getHeight()/2 - normalBitmap.getWidth()/2, normalBitmap.getWidth(), normalBitmap.getWidth()
+                );
+            }
+            //iconBitmap = Bitmap.createBitmap(normalBitmap, 400, 400, normalBitmap.getWidth()/2 - 800, normalBitmap.getHeight()/2 - 800, null, true);
+            findFilters();
         }
 
     }
+
+    void findFilters(){
+
+       final ArrayList<FilterView>filters =  new ArrayList<>();
+
+
+        FilterView normalFilter = findViewById(R.id.normalFiltr);
+        normalFilter.setType("Normal");
+        normalFilter.mainActivity = this;
+        filters.add(normalFilter);
+
+        //normalFilter.setBitmaps(normalBitmap,iconBitmap);
+
+        FilterView negativFilter = findViewById(R.id.negativFiltr);
+        negativFilter.setType("Negativ");
+        negativFilter.mainActivity = this;
+        filters.add(negativFilter);
+
+        //negativFilter.setBitmaps(normalBitmap,iconBitmap);
+
+        FilterView monochromeFilter = findViewById(R.id.monochromeFiltr);
+        monochromeFilter.setType("Monochrome");
+        monochromeFilter.mainActivity = this;
+        filters.add(monochromeFilter);
+
+        //monochromeFilter.setBitmaps(normalBitmap,iconBitmap);
+
+//        FilterView f4 = findViewById(R.id.warmFiltr);
+//        f4.setType("4");
+//        f4.mainActivity = this;
+//        f4.setBitmaps(normalBitmap,iconBitmap);
+
+        FilterView sepiaFilter = findViewById(R.id.sepiaFiltr);
+        sepiaFilter.setType("Sepia");
+        sepiaFilter.mainActivity = this;
+        filters.add(sepiaFilter);
+
+        //sepiaFilter.setBitmaps(normalBitmap,iconBitmap);
+
+        FilterView binaryFilter = findViewById(R.id.binaryFiltr);
+        binaryFilter.setType("Binary");
+        binaryFilter.mainActivity = this;
+        filters.add(binaryFilter);
+
+       // binaryFilter.setBitmaps(normalBitmap,iconBitmap);
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(6000);
+                } catch( InterruptedException e ) {
+
+                }
+
+                runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        for(int i = 0; i < filters.size(); i++){
+
+                            FilterView filterView = filters.get(i);
+                            filterView.setBitmaps(normalBitmap,iconBitmap);
+                        }                    }
+                });
+            }
+        }).start();
+
+
+    }
+
+
+
 
 }
